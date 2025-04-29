@@ -28,11 +28,6 @@ variable "glue_crawler_name" {
   type        = string
 }
 
-variable "glue_target_s3_path" {
-  description = "S3 path to crawl"
-  type        = string
-}
-
 variable "glue_role_arn" {
   description = "IAM Role ARN for Glue Crawler"
   type        = string
@@ -46,6 +41,28 @@ variable "lambda_function_one_name" {
 variable "lambda_function_two_name" {
   description = "Name of the second Lambda function"
   type        = string
+}
+
+variable "lambda_one_handler" {
+  description = "Handler for the first Lambda function"
+  type        = string
+}
+
+variable "lambda_two_handler" {
+  description = "Handler for the second Lambda function"
+  type        = string
+}
+
+variable "lambda_one_runtime" {
+  description = "Python runtime for the first Lambda function"
+  type        = string
+  default     = "python3.12"
+}
+
+variable "lambda_two_runtime" {
+  description = "Python runtime for the second Lambda function"
+  type        = string
+  default     = "python3.12"
 }
 
 variable "lambda_role_arn" {

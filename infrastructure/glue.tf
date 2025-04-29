@@ -7,7 +7,7 @@ resource "aws_glue_crawler" "my_crawler" {
   database_name = aws_glue_catalog_database.my_database.name
   role = var.glue_role_arn
   s3_target {
-    path = var.glue_target_s3_path
+    path = "s3://${var.bucket_name}/offers/"
   }
 }
 

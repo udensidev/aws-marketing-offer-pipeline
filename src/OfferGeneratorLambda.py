@@ -9,7 +9,7 @@ offers_table = boto3.resource('dynamodb').Table('Offers')
 s3 = boto3.client('s3')
 BUCKET_NAME = 'real-time-offers-archive-mudensi2'
 
-def lambda_handler(event, context):
+def handler(event, context):
     for record in event['Records']:
         try:
             if record['eventName'] != 'INSERT':
