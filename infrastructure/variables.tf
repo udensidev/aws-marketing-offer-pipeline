@@ -6,26 +6,31 @@ variable "bucket_name" {
 variable "kinesis_stream_name" {
   description = "The name of the Kinesis Data Stream"
   type        = string
+  default     = "BrowsingClickstream"
 }
 
 variable "dynamodb_table_one_name" {
   description = "Name of the first DynamoDB table (with Streams enabled)"
   type        = string
+  default     = "BrowsingEvents"
 }
 
 variable "dynamodb_table_two_name" {
   description = "Name of the second DynamoDB table"
   type        = string
+  default     = "Offers"
 }
 
 variable "glue_database_name" {
   description = "Name of the Glue database"
   type        = string
+  default     = "offers_db"
 }
 
 variable "glue_crawler_name" {
   description = "Name of the Glue crawler"
   type        = string
+  default     = "offers-crawler"
 }
 
 variable "glue_role_arn" {
@@ -36,21 +41,25 @@ variable "glue_role_arn" {
 variable "lambda_function_one_name" {
   description = "Name of the first Lambda function"
   type        = string
+  default     = "IngestorLambda"
 }
 
 variable "lambda_function_two_name" {
   description = "Name of the second Lambda function"
   type        = string
+  default     = "OfferGeneratorLambda"
 }
 
 variable "lambda_one_handler" {
   description = "Handler for the first Lambda function"
   type        = string
+  default     = "IngestorLambda.handler"
 }
 
 variable "lambda_two_handler" {
   description = "Handler for the second Lambda function"
   type        = string
+  default     = "OfferGeneratorLambda.handler"
 }
 
 variable "lambda_one_runtime" {

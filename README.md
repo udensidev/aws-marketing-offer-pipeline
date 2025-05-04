@@ -10,6 +10,7 @@ This project implements a real-time, serverless data pipeline using AWS services
 
 ## 📂 Project Structure
 
+```bash
 aws-marketing-offers-pipeline/
 ├── infrastructure/         # Terraform code for provisioning AWS resources
 ├── src/                    # Lambda function code and simulator script
@@ -21,6 +22,7 @@ aws-marketing-offers-pipeline/
 ├── Makefile                 # Deployment automation
 ├── .gitignore
 └── README.md
+```
 
 ## 🛠️ Tools & Services Used
 
@@ -35,7 +37,7 @@ aws-marketing-offers-pipeline/
 
 ## 🧪 Step-by-Step Setup Instructions
 
-1. ✅ Configure AWS CLI
+###  1. Configure AWS CLI
 
 ```bash
 aws configure
@@ -59,7 +61,7 @@ export AWS_SESSION_TOKEN="your-session-token"
 ⚠️ Without these credentials, Terraform and Python scripts will fail with errors like:
 `The security token included in the request is invalid` or `UnrecognizedClientException`.
 
-2. ✅ Create a Virtual Environment (to avoid dependency issues)
+###  2. Create a Virtual Environment (to avoid dependency issues)
 
 We strongly recommend creating a virtual environment for Python to avoid dependency conflicts with your system Python (especially on macOS with Homebrew):
 
@@ -71,16 +73,17 @@ pip install boto3 pandas
 
 Why this matters:
 - Keeps your Python packages isolated to the project
-- Avoids errors like ModuleNotFoundError: No module named 'boto3' even after installation
+- Avoids errors like `ModuleNotFoundError: No module named 'boto3'` even after installation
 - Prevents conflicts with Homebrew-protected environments (PEP 668)
 
 ✅ Once the environment is activated, you can run the simulator confidently and install packages safely.
 
-3. ✅ Set Up terraform.tfvars
+### 3. Set Up terraform.tfvars
+
 Inside the `infrastructure/` folder, create a file named `terraform.tfvars`:
 
 ```bash
-bucket_name = "real-time-offers-archive-<unique-identifier>"
+bucket_name = "-<unique-bucket-name>"
 lambda_role_arn = "arn:aws:iam::<account-id>:role/YourLambdaExecutionRole"
 ```
 This provides the IAM role ARN that your Lambda functions will assume.
@@ -97,7 +100,28 @@ This provides the IAM role ARN that your Lambda functions will assume.
 - kinesis:GetRecords, dynamodb:StreamRead
 - s3:PutObject, etc. as needed
 
-4. ✅ Deploy Using Makefile
+### 4. Unique S3 Bucket Naming Strategy
+
+To ensure the S3 bucket name is globally unique, Terraform uses a random_id generator.
+
+In main.tf, you'll see:
+
+```bash
+resource "random_id" "suffix" {
+  byte_length = 4
+}
+
+resource "aws_s3_bucket" "offers_archive" {
+  bucket        = "real-time-offers-archive-${random_id.suffix.hex}"
+  force_destroy = true
+}
+```
+This automatically creates a bucket name like `real-time-offers-archive-a2f9b31c`. There is no need to manually supply a name and it avoids name collision errors like:
+
+`BucketAlreadyExists: The requested bucket name is not available.`
+
+
+### 5. Provision Resources
 
 From the project root:
 
@@ -108,10 +132,23 @@ make deploy
 This will:
 - Install Python dependencies
 - Initialize and apply Terraform
-- Wait 60 seconds for AWS services to stabilize
-- Start sending events from the simulator
+- Provision the infrastructure resources
 
-5. ✅ Clean Up When Done
+After deployment completes, you can retrieve generated resource names for your reference.
+
+### 6. Run the Event Simulator
+
+Once your infrastructure is up, run the simulator to send events into the pipeline:
+
+make simulate
+This script sends synthetic browsing events to the Kinesis stream, triggering:
+
+- Lambda 1 (IngestorLambda) → stores raw data in DynamoDB
+- DynamoDB Streams → triggers Lambda 2 (OfferProcessorLambda)
+- Lambda 2 → transforms and stores processed records in S3
+- Glue Crawler (running every minute) updates your Athena catalog
+
+### 5. Clean Up When Done
 
 To destroy all provisioned resources:
 

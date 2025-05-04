@@ -10,7 +10,7 @@ install:
 
 wait:
 	@echo "⏳ Waiting for AWS services to stabilize..."
-	@bash -c 'secs=3; \
+	@bash -c 'secs=20; \
 	echo -n "Waiting $$secs seconds... "; \
 	while [ $$secs -gt 0 ]; do \
 	  printf "\r⏳ Waiting %02d seconds... " "$$secs"; \
@@ -25,14 +25,14 @@ deploy: install
 	@cd infrastructure && terraform init -input=false
 	@cd infrastructure && terraform apply -auto-approve
 	@echo "✅ Infrastructure provisioned successfully!"
-	@sleep 2
+	
+	@make simulate
+
+simulate:
 	clear
 	@make wait
 	@sleep 2
 	clear
-	@make simulate
-
-simulate:
 	@echo "📡 Running the simulator..."
 	@sleep 2
 	clear
